@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">智能点餐</string>
+    <string name="no_more_data">数据全部加载完成</string>
+</resources>
