@@ -1,7 +1,6 @@
 package com.shenzhou.intelligenceordering.request;
 
 
-import com.shenzhou.intelligenceordering.bean.Book;
 import com.shenzhou.intelligenceordering.bean.LoginResult;
 import com.shenzhou.intelligenceordering.bean.OrderResult;
 import com.shenzhou.intelligenceordering.bean.ResultVo;
@@ -19,9 +18,7 @@ public class DataManager {
     public DataManager(){
         this.mRetrofitService = RetrofitHelper.getInstance().getServer();
     }
-    public Observable<Book> getSearchBooks(String name, String tag, int start, int count){
-        return mRetrofitService.getSearchBook(name,tag,start,count);
-    }
+
     //登录
     public Observable<LoginResult> loginReq(Map<String, String> map){
         return mRetrofitService.loginReq(map);

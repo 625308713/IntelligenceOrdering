@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.shenzhou.intelligenceordering.R;
@@ -23,6 +24,7 @@ import com.shenzhou.intelligenceordering.R;
  */
 public class ModifyIpDialog extends DialogFragment {
     private EditText ip_1,ip_2,ip_3,ip_4;
+    private BtnClickInteface btnClickInteface;
 
     @Nullable
     @Override
@@ -42,6 +44,16 @@ public class ModifyIpDialog extends DialogFragment {
         ip_2 = view.findViewById(R.id.ip_2);
         ip_3 = view.findViewById(R.id.ip_3);
         ip_4 = view.findViewById(R.id.ip_4);
+        String ipStr = SPUtils.getInstance().getString("printIp");
+        if(!StringUtils.isEmpty(ipStr)){
+            String[] ss = ipStr.split("\\.");
+            if(ss != null && ss.length == 4){
+                ip_1.setText(ss[0]);
+                ip_2.setText(ss[1]);
+                ip_3.setText(ss[2]);
+                ip_4.setText(ss[3]);
+            }
+        }
         Button btn_1 = view.findViewById(R.id.btn_modify);
         btn_1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,6 +62,8 @@ public class ModifyIpDialog extends DialogFragment {
                         || StringUtils.isEmpty(ip_3.getText()+"") || StringUtils.isEmpty(ip_4.getText()+"")){
                     ToastUtils.showShort("请输入正确的IP地址");
                     return;
+                }else{
+                    btnClickInteface.btnClick(ip_1.getText()+"",ip_2.getText()+"",ip_3.getText()+"",ip_4.getText()+"");
                 }
                 dismiss();
             }
@@ -62,5 +76,14 @@ public class ModifyIpDialog extends DialogFragment {
             }
         });
         return builder.create();
+    }
+
+    //设置IP接口
+    public interface BtnClickInteface{
+        void btnClick(String ip1,String ip2,String ip3,String ip4);
+    }
+
+    public void setBtnClickInteface(BtnClickInteface btnClickInteface) {
+        this.btnClickInteface = btnClickInteface;
     }
 }

@@ -1,14 +1,22 @@
 package com.shenzhou.intelligenceordering.ui.activity;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.SPUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -25,6 +33,9 @@ import com.shenzhou.intelligenceordering.presenter.CommonPresenter;
 import com.shenzhou.intelligenceordering.presenter.OrderListPresenter;
 import com.shenzhou.intelligenceordering.presenter.view.CommonView;
 import com.shenzhou.intelligenceordering.presenter.view.OrderView;
+import com.shenzhou.intelligenceordering.print.Constants;
+import com.shenzhou.intelligenceordering.print.PrintService;
+import com.shenzhou.intelligenceordering.print.PrintStatusListener;
 import com.shenzhou.intelligenceordering.until.MyUntil;
 
 import java.util.ArrayList;
@@ -38,12 +49,13 @@ import java.util.concurrent.TimeUnit;
 import gorden.rxbus2.RxBus;
 import gorden.rxbus2.Subscribe;
 
-public class MainActivity extends BaseActivity implements View.OnClickListener{
+public class MainActivity extends BaseActivity implements View.OnClickListener,ModifyIpDialog.BtnClickInteface {
     private OrderListPresenter orderListPresenter;
     private CommonPresenter commonPresenter;
     private RecyclerView my_recycler;
     private List<OrderBean> orderBeans;
     private OrderListAdapter orderAdapter;
+    //定时请求数据线程
     private ScheduledExecutorService scheduler;
     private long mExitTime;
     //是否全部打印完成
@@ -51,6 +63,92 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
     private QMUITipDialog tipDialog;
     //当前打印的订单
     private OrderBean currentOrderBean;
+    private ServiceConnection sc;
+    private PrintService printService;
+    //设置IP弹框
+    private ModifyIpDialog modifyIpDialog;
+    //打印IP
+    private String printIp = SPUtils.getInstance().getString("printIp");
+    //打印机状态
+    private TextView printer_state;
+    //每次请求来的未打印数据
+    private List<OrderBean> orderBeanList;
+    private Handler mHandler = new Handler(new Handler.Callback() {
+        @Override
+        public boolean handleMessage(Message msg) {
+            int aa = msg.what;
+            switch (aa) {
+                case Constants.RESP_STATUS_OK:
+                    SPUtils.getInstance().put("printIp",printIp);
+                    printer_state.setText("打印机就绪");
+                    Log.i("dai","打印机就绪"+printIp);
+                    break;
+                case Constants.RESP_STATUS_PRINTING:
+                    printer_state.setText("正在打印...");
+                    Log.i("dai","正在打印...");
+                    break;
+                case Constants.RESP_STATUS_OUT_OF_PAPER:
+                    printer_state.setText("打印机缺纸");
+                    Log.i("dai","打印机缺纸");
+                    break;
+                case Constants.RESP_STATUS_OPEN_TOP:
+                    printer_state.setText("打印机盖未关闭");
+                    Log.i("dai","打印机盖未关闭");
+                    break;
+                case Constants.RESP_STATUS_NOCOMPLETE_OFF_PRINT:
+                    printer_state.setText("等待重新初始化打印机");
+                    Log.i("dai","等待重新初始化打印机");
+                    break;
+                case Constants.RESP_STATUS_OTHER_OFF_PRINT:
+                    printer_state.setText("等待重新初始化打印机");
+                    Log.i("dai","等待重新初始化打印机");
+                    break;
+                case Constants.RESP_MSG_PRINT_SUCCESS:
+                    Log.i("dai","当前打印菜名:"+currentOrderBean.getCpName());
+                    //修改打印状态
+                    currentOrderBean.setIsPrint(1);
+                    orderAdapter.notifyDataSetChanged();
+                    //修改服务端状态
+                    Map map = new HashMap<String, String>();
+                    map.put("orderNo", currentOrderBean.getOrderNo());
+                    map.put("id",currentOrderBean.getId()+"");
+                    commonPresenter.updateOrderFlagReq(map);
+                    Log.i("dai","打印成功");
+                    //发送消息，可打印下一条
+                    RxBus.get().send(API.R_2);
+                    break;
+                case Constants.RESP_MSG_PRINT_FAILED:
+                    Log.i("dai","打印失败");
+                    break;
+                case Constants.RESP_MSG_CONNECTING:
+                    printer_state.setText("正在连接....");
+                    break;
+                case Constants.RESP_MSG_CONNECT_SUCCESS:
+                    printer_state.setText("打印机连接成功");
+                    break;
+                case Constants.RESP_MSG_HOST_ERROR:
+                    printer_state.setText("打印机地址错误");
+                    break;
+                case Constants.RESP_MSG_CONNECT_EXCEPTION:
+                    printer_state.setText("打印机连接异常，请检查网络和打印机");
+                    break;
+                case Constants.RESP_MSG_SOCKET_TIMEOUT:
+                    printer_state.setText("打印机连接超时");
+                    break;
+                case Constants.RESP_MSG_RECONNECT:
+                    Bundle bundle = msg.getData();
+                    if(bundle != null){
+                        printer_state.setText("正在重连: " + bundle.get("msgContent"));
+                    }
+                    break;
+                case Constants.IP_NULL:
+                    //弹出设置IP
+                    modifyIpDialog.show(getFragmentManager(),"ModifyIpDialog");
+                    break;
+            }
+            return false;
+        }
+    });
 
     @Override
     protected void setContentView() {
@@ -68,29 +166,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
         RxBus.get().register(this);
         orderListPresenter = new OrderListPresenter();
         orderListPresenter.onCreate();
+        modifyIpDialog = new ModifyIpDialog();
+        modifyIpDialog.setBtnClickInteface(MainActivity.this);
         commonPresenter = new CommonPresenter();
         commonPresenter.onCreate();
         orderBeans = new ArrayList<OrderBean>();
         orderAdapter = new OrderListAdapter(R.layout.adapter_order_list_item,orderBeans);
         scheduler = Executors.newSingleThreadScheduledExecutor();
+        printer_state = findViewById(R.id.printer_state);
         tipDialog = new QMUITipDialog.Builder(myContext)
                 .setIconType(QMUITipDialog.Builder.ICON_TYPE_LOADING)
                 .setTipWord("获取数据...")
                 .create();
-
-        //修改状态 todo 要去掉
-//        orderAdapter.setOnItemChildClickListener(new BaseQuickAdapter.OnItemChildClickListener() {
-//            @Override
-//            public void onItemChildClick(BaseQuickAdapter adapter, View view, int position) {
-//                currentOrderBean = orderBeans.get(position);
-//                if(currentOrderBean != null){
-//                    Map map = new HashMap<String, String>();
-//                    map.put("orderNo", currentOrderBean.getOrderNo());
-//                    map.put("id",currentOrderBean.getId()+"");
-//                    commonPresenter.updateOrderFlagReq(map);
-//                }
-//            }
-//        });
     }
 
     @Override
@@ -105,7 +192,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
         setAdapter();
         //开启定时请求服务
         long period = API.REQUEST_ORDERING_TIME;
-        long initDelay = 1*1000;
+        long initDelay = 2*1000;
         scheduler.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
@@ -122,6 +209,53 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
             }
         }, initDelay, period, TimeUnit.MILLISECONDS);
 
+        //绑定打印服务
+        bindSocketService();
+    }
+
+    private void bindSocketService() {
+        /*通过binder拿到service*/
+        sc = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                printService = ((PrintService.SocketBinder) service).getService();
+                printService.setPrintStatusListener(new PrintStatusListener() {
+                    @Override
+                    public void onPrinterListener(int status) {
+                        Message message = mHandler.obtainMessage();
+                        message.what = status;
+                        mHandler.sendMessage(message);
+                    }
+
+                    @Override
+                    public void onMessageListener(int msgId, String msgContent) {
+                        Message message = mHandler.obtainMessage();
+                        message.what = msgId;
+                        Bundle bundle = new Bundle();
+                        bundle.putString("msgContent", msgContent);
+                        message.setData(bundle);
+                        mHandler.sendMessage(message);
+                    }
+                });
+                String ipStr = SPUtils.getInstance().getString("printIp");
+                if(!StringUtils.isEmpty(ipStr)){
+                    printer_state.setText("正在连接打印机....");
+                    printService.initSocket(ipStr, 9100);
+                }else{
+                    Message message = mHandler.obtainMessage();
+                    message.what = Constants.IP_NULL;
+                    mHandler.sendMessage(message);
+                }
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                printService = null;
+            }
+        };
+
+        Intent intent = new Intent(getApplicationContext(), PrintService.class);
+        bindService(intent, sc, BIND_AUTO_CREATE);
     }
 
     private void setAdapter(){
@@ -135,15 +269,20 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
         @Override
         public void onSuccess(OrderResult resultVo) {
             tipDialog.dismiss();
-            List<OrderBean> orderBeanList = resultVo.getResultList();
+            orderBeanList = resultVo.getResultList();
+            Log.i("dai",TimeUtils.getNowString()+" 本次获取未打印订单数："+orderBeanList.size());
             if(MyUntil.isNotNullCollect(orderBeanList)){
-               //有未打印数据
+                //有未打印数据
                 isAllPrinted = false;
+                //拿出第一条打印
+                currentOrderBean = orderBeanList.get(0);
+                if(currentOrderBean != null && printService != null){
+                    printService.printMenu(currentOrderBean);
+                }
                 //新数据都放在最前端
                 orderBeans.addAll(0,orderBeanList);
                 my_recycler.setAdapter(orderAdapter);
                 orderAdapter.notifyDataSetChanged();
-                Log.i("dai",TimeUtils.getNowString()+" 本次获取未打印订单数："+orderBeans.size());
             }
         }
 
@@ -157,17 +296,15 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
     private CommonView commonView = new CommonView() {
         @Override
         public void onSuccess(ResultVo resultVo) {
-            currentOrderBean.setIsPrint(1);
-            orderAdapter.notifyDataSetChanged();
             //每打印完成一个后遍历看是否还有未打印的。如果没有则可再请求数据
             isAllPrinted = true;
-            for(OrderBean ob:orderBeans){
+            for(OrderBean ob:orderBeanList){
                 if(ob.getIsPrint() == 0){
                     isAllPrinted = false;
                     return;
                 }
             }
-            Log.i("dai","是否还有未打印数据:"+isAllPrinted);
+            Log.i("dai","是否全部打印完成:"+isAllPrinted);
         }
 
         @Override
@@ -184,7 +321,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
                 personInfoDialog.show(getFragmentManager(),"PersonInfoDialog");
                 break;
             case R.id.img_ip:
-                ModifyIpDialog modifyIpDialog = new ModifyIpDialog();
                 modifyIpDialog.show(getFragmentManager(),"ModifyIpDialog");
                 break;
         }
@@ -209,11 +345,30 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
             System.exit(0);
         }
     }
-    //接收RxBus消息
+
+    //修改完成密码,退到登录页面
     @Subscribe(code = API.R_1)
     public void closeAndTurn(){
         startActivity(new Intent(myContext,LoginActivity.class));
         finish();
+    }
+
+    //可打印下一条
+    @Subscribe(code = API.R_2)
+    public void printOtherItem(){
+        if(MyUntil.isNotNullCollect(orderBeanList)){
+            for(int i=1;i<orderBeanList.size();i++){
+                //当前数据还有未打印的
+                OrderBean ob = orderBeanList.get(i);
+                if(ob.getIsPrint() == 0){
+                    currentOrderBean = ob;
+                    if(currentOrderBean != null && printService != null){
+                        printService.printMenu(currentOrderBean);
+                    }
+                    return;
+                }
+            }
+        }
     }
 
     @Override
@@ -221,5 +376,18 @@ public class MainActivity extends BaseActivity implements View.OnClickListener{
         super.onDestroy();
         //解除绑定RxBus
         RxBus.get().unRegister(this);
+        unbindService(sc);
+        Intent intent = new Intent(getApplicationContext(), PrintService.class);
+        stopService(intent);
+        //及时清除消息
+        mHandler.removeCallbacksAndMessages(null);
+    }
+
+    @Override
+    public void btnClick(String ip1, String ip2, String ip3, String ip4) {
+        printService.setmConnectCount(1);
+        printIp = ip1+"."+ip2+"."+ip3+"."+ip4;
+        printer_state.setText("正在连接打印机....");
+        printService.initSocket(printIp, 9100);
     }
 }

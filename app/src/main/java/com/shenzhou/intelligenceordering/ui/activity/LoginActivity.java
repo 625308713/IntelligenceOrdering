@@ -53,7 +53,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
 
     @Override
     protected void initOther() {
-        Log.i("dai","APPCODE:"+AppUtils.getAppVersionCode()+"..APPVersionName:"+AppUtils.getAppVersionName());
         loginPresenter = new LoginPresenter();
         loginPresenter.onCreate();
         versionPresenter = new VersionPresenter();
@@ -81,7 +80,6 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
     public void onClick(View view) {
         switch (view.getId()){
             case R.id.btn_login:
-//                startActivity(new Intent(LoginActivity.this,MainActivity.class));
                 if(StringUtils.isEmpty(edit_name.getText()+"")){
                     ToastUtils.showShort("请输入用户名");
                     return;

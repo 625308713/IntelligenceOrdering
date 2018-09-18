@@ -13,4 +13,5 @@ public class API {
 
     /**********************RxBus-caode**********************/
     public static final int R_1 = 1;//修改密码完成，退出系统回到登录页面
+    public static final int R_2 = 2;//打印完成，可打印下一条
 }

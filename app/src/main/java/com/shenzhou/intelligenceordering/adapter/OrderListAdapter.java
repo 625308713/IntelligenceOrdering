@@ -2,13 +2,10 @@ package com.shenzhou.intelligenceordering.adapter;
 
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
-import android.widget.ImageView;
 
-import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.BaseViewHolder;
 import com.shenzhou.intelligenceordering.R;
-import com.shenzhou.intelligenceordering.bean.Book;
 import com.shenzhou.intelligenceordering.bean.OrderBean;
 
 import java.util.List;

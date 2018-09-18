@@ -48,10 +48,7 @@
             android:name=".ui.activity.MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:screenOrientation="landscape" />
-        <activity
-            android:name=".ui.activity.DemoActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
-            android:screenOrientation="landscape" />
 
+        <service android:name=".print.PrintService"/>
     </application>
 </manifest>
