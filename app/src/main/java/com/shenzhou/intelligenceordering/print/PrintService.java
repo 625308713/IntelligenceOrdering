@@ -18,6 +18,7 @@ import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 /**
@@ -121,7 +122,7 @@ public class PrintService extends Service {
                     //开启读取线程
                     new ReadThread().start();
                     //开启心跳线程
-//                    new HeartBeatThread().start();
+                    new HeartBeatThread().start();
                     //开启自动状态返回
                     sendData(Constants.COMM_BACK_STATUS_ON, false);
                 }
@@ -343,12 +344,18 @@ public class PrintService extends Service {
         @Override
         public void run() {
             super.run();
+            try {
+                mSocket.setOOBInline(true);
+                mSocket.setKeepAlive(true);
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
+
             while(!isCancel){
                 try {
-                    if(!isConnected()){
-                        break;
-                    }
-
+//                    if(!isConnected()){
+//                        break;
+//                    }
                     mSocket.sendUrgentData(0xFF);
                     Log.i("aaaaaaaaaaaaaaaa", "-----HeartBeatThread---");
     //                SetState(true);

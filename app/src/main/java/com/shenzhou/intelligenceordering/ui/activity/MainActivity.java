@@ -280,7 +280,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,M
                 //拿出第一条打印
                 currentOrderBean = orderBeanList.get(0);
                 if(currentOrderBean != null && printService != null){
-                    printService.printMenu(currentOrderBean);
+                    printService.printOneColumnMenu(currentOrderBean);
                 }
                 //新数据都放在最前端
                 orderBeans.addAll(0,orderBeanList);
@@ -366,7 +366,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,M
                 if(ob.getIsPrint() == 0){
                     currentOrderBean = ob;
                     if(currentOrderBean != null && printService != null){
-                        printService.printMenu(currentOrderBean);
+                        printService.printOneColumnMenu(currentOrderBean);
                     }
                     return;
                 }
