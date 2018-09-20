@@ -6,6 +6,9 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.shenzhou.intelligenceordering.bean.OrderBean;
+import com.shenzhou.intelligenceordering.bean.OrderPojo;
+
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;

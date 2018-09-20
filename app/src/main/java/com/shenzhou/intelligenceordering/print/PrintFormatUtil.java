@@ -1,5 +1,9 @@
 package com.shenzhou.intelligenceordering.print;
 
+import com.shenzhou.intelligenceordering.bean.OrderBean;
+import com.shenzhou.intelligenceordering.bean.OrderItem;
+import com.shenzhou.intelligenceordering.bean.OrderPojo;
+
 import java.nio.charset.Charset;
 import java.util.List;
 
