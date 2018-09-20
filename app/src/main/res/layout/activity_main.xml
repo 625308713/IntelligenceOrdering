@@ -26,15 +26,15 @@
           android:orientation="horizontal"
           android:gravity="right">
          <ImageView
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
+             android:layout_width="42dp"
+             android:layout_height="42dp"
              android:id="@+id/img_ip"
              android:onClick="onClick"
-             android:src="@drawable/side_have_icon"/>
+             android:src="@drawable/ip_btn"/>
          <ImageView
              android:layout_marginLeft="10dp"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
+             android:layout_width="42dp"
+             android:layout_height="42dp"
              android:id="@+id/img_person"
              android:onClick="onClick"
              android:src="@drawable/side_my_icon"/>

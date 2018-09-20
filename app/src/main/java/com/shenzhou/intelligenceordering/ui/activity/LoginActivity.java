@@ -110,7 +110,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
                 //保存登录名
                 SPUtils.getInstance().put("loginName",edit_name.getText().toString());
 
-                startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                startActivity(new Intent(LoginActivity.this,MainActivity2.class));
                 finish();
             }else{
                 ToastUtils.showShort(resultVo.getMessage());

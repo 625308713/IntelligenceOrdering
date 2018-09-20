@@ -2,6 +2,7 @@ package com.shenzhou.intelligenceordering.request;
 
 
 import com.shenzhou.intelligenceordering.bean.LoginResult;
+import com.shenzhou.intelligenceordering.bean.OrderCollectionResult;
 import com.shenzhou.intelligenceordering.bean.OrderResult;
 import com.shenzhou.intelligenceordering.bean.ResultVo;
 import com.shenzhou.intelligenceordering.bean.VersionResult;
@@ -29,14 +30,24 @@ public class DataManager {
         return mRetrofitService.modifyPsdReq(map);
     }
 
-    //请求菜单列表
+    //请求菜单列表(单个)
     public Observable<OrderResult> orderListReq(Map<String, String> map){
         return mRetrofitService.orderListReq(map);
     }
 
-    //修改打印状态
+    //请求菜单列表(多个)
+    public Observable<OrderCollectionResult> orderCollectionReq(Map<String, String> map){
+        return mRetrofitService.orderCollectionReq(map);
+    }
+
+    //修改打印状态1
     public Observable<ResultVo> updateOrderFlagReq(Map<String, String> map){
         return mRetrofitService.updateOrderFlagReq(map);
+    }
+
+    //修改打印状态2
+    public Observable<ResultVo> modifyOrderPrintInfo(Map<String, String> map){
+        return mRetrofitService.modifyOrderPrintInfo(map);
     }
 
     //获取版本信息

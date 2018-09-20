@@ -1,11 +1,9 @@
 package com.shenzhou.intelligenceordering.presenter;
 
 
-import com.shenzhou.intelligenceordering.bean.OrderResult;
-import com.shenzhou.intelligenceordering.bean.ResultVo;
-import com.shenzhou.intelligenceordering.presenter.view.CommonView;
+import com.shenzhou.intelligenceordering.bean.OrderCollectionResult;
 import com.shenzhou.intelligenceordering.presenter.view.MyView;
-import com.shenzhou.intelligenceordering.presenter.view.OrderView;
+import com.shenzhou.intelligenceordering.presenter.view.OrderCollectionView;
 
 import java.util.Map;
 
@@ -14,23 +12,22 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 /**
- * 菜单列表(单个)
+ * 菜单列表(多个)
  */
-public class OrderListPresenter extends BasePresenter{
-    private OrderView orderView;
-    private OrderResult orderResult;
+public class OrderCollectionPresenter extends BasePresenter{
+    private OrderCollectionView orderView;
+    private OrderCollectionResult orderResult;
 
     @Override
     public void attachView(MyView view) {
-        orderView = (OrderView)view;
+        orderView = (OrderCollectionView)view;
     }
 
-    //获取菜单列表
-    public void orderListReq(Map<String, String> map){
-        mCompositeSubscription.add(manager.orderListReq(map)
+    public void orderCollectionReq(Map<String, String> map){
+        mCompositeSubscription.add(manager.orderCollectionReq(map)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<OrderResult>() {
+                .subscribe(new Observer<OrderCollectionResult>() {
                     @Override
                     public void onCompleted() {
                         if (orderResult != null){
@@ -45,7 +42,7 @@ public class OrderListPresenter extends BasePresenter{
                     }
 
                     @Override
-                    public void onNext(OrderResult rv) {
+                    public void onNext(OrderCollectionResult rv) {
                         orderResult = rv;
                     }
                 })

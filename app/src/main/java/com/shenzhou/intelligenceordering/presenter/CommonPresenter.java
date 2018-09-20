@@ -24,7 +24,7 @@ public class CommonPresenter extends BasePresenter{
         commonView = (CommonView)view;
     }
 
-    //回执打印状态
+    //回执打印状态1
     public void updateOrderFlagReq(Map<String, String> map){
         mCompositeSubscription.add(manager.updateOrderFlagReq(map)
                 .subscribeOn(Schedulers.io())
@@ -50,4 +50,32 @@ public class CommonPresenter extends BasePresenter{
                 })
         );
     }
+
+    //回执打印状态2
+    public void modifyOrderPrintInfo(Map<String, String> map){
+        mCompositeSubscription.add(manager.modifyOrderPrintInfo(map)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ResultVo>() {
+                    @Override
+                    public void onCompleted() {
+                        if (resultVo != null){
+                            commonView.onSuccess(resultVo);
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        commonView.onError("请求失败");
+                    }
+
+                    @Override
+                    public void onNext(ResultVo rv) {
+                        resultVo = rv;
+                    }
+                })
+        );
+    }
+
 }

@@ -2,6 +2,7 @@ package com.shenzhou.intelligenceordering.request;
 
 
 import com.shenzhou.intelligenceordering.bean.LoginResult;
+import com.shenzhou.intelligenceordering.bean.OrderCollectionResult;
 import com.shenzhou.intelligenceordering.bean.OrderResult;
 import com.shenzhou.intelligenceordering.bean.ResultVo;
 import com.shenzhou.intelligenceordering.bean.VersionResult;
@@ -21,13 +22,21 @@ public interface RetrofitService {
     @POST("hc/modifyPassword.action")
     Observable<LoginResult> modifyPsdReq(@QueryMap Map<String, String> map);
 
-    //请求菜单列表
+    //请求菜单列表(单个菜品)
     @POST("hc/searchPrintList.action")
     Observable<OrderResult> orderListReq(@QueryMap Map<String, String> map);
+
+    //请求菜单列表(多个菜品)
+    @POST("hc/searchOrderPrintList.action")
+    Observable<OrderCollectionResult> orderCollectionReq(@QueryMap Map<String, String> map);
 
     //修改打印状态
     @POST("hc/modifyOrderPrint.action")
     Observable<ResultVo> updateOrderFlagReq(@QueryMap Map<String, String> map);
+
+    //修改打印状态
+    @POST("hc/modifyOrderPrintInfo.action")
+    Observable<ResultVo> modifyOrderPrintInfo(@QueryMap Map<String, String> map);
 
     //获取版本信息
     @POST("hc/searchHcAppVersion.action")
