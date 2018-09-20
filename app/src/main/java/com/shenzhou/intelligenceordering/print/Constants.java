@@ -44,11 +44,11 @@ public class Constants {
      */
     public static final int RESP_MSG_CONNECTING = 2001; //正在连接
     public static final int RESP_MSG_CONNECT_SUCCESS = 2002; //连接成功
-    public static final int RESP_MSG_HOST_ERROR = 2003; //地址不存在
+    public static final int RESP_MSG_HOST_ERROR = 2003; //地址不存在或没有找到打印机
     public static final int RESP_MSG_CONNECT_EXCEPTION = 2004;  //连接异常或被拒绝
     public static final int RESP_MSG_SOCKET_TIMEOUT= 2005;  //连接超时
     public static final int RESP_MSG_RECONNECT = 2006; //正在重连
-
+    public static final int RESP_MSG_DISCONNECT = 2007; //断开连接
 
     public static final int RESP_MSG_PRINT_SUCCESS = 2100; //打印成功
     public static final int RESP_MSG_PRINT_FAILED = 2200; //打印失败
