@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
-import android.util.Log;
 
 import com.shenzhou.intelligenceordering.bean.OrderBean;
 import com.shenzhou.intelligenceordering.bean.OrderPojo;
@@ -18,6 +17,7 @@ import java.net.ConnectException;
 import java.net.InetSocketAddress;
 import java.net.NoRouteToHostException;
 import java.net.Socket;
+import java.net.SocketException;
 import java.net.SocketTimeoutException;
 
 /**
@@ -338,12 +338,18 @@ public class PrintService extends Service {
         @Override
         public void run() {
             super.run();
+            try {
+                mSocket.setOOBInline(true);
+                mSocket.setKeepAlive(true);
+            } catch (SocketException e) {
+                e.printStackTrace();
+            }
+
             while(!isCancel){
                 try {
-                    if(!isConnected()){
-                        break;
-                    }
-
+//                    if(!isConnected()){
+//                        break;
+//                    }
                     mSocket.sendUrgentData(0xFF);
     //                SetState(true);
                     Thread.sleep(1000);
