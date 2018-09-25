@@ -35,7 +35,7 @@ public interface RetrofitService {
     Observable<ResultVo> updateOrderFlagReq(@QueryMap Map<String, String> map);
 
     //修改打印状态
-    @POST("hc/modifyOrderPrintInfo.action")
+    @POST("hc/modifyOrderPrint.action")
     Observable<ResultVo> modifyOrderPrintInfo(@QueryMap Map<String, String> map);
 
     //获取版本信息

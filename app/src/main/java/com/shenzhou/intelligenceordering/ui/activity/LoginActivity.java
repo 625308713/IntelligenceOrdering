@@ -72,6 +72,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
         loginPresenter.attachView(loginView);
         versionPresenter.attachView(vv);
         edit_name.setText(SPUtils.getInstance().getString("loginName"));
+        edit_psd.setText(SPUtils.getInstance().getString("loginPsd"));
         versionDialog.show();
         versionPresenter.getVersionInfo();
     }
@@ -102,14 +103,13 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
         public void onSuccess(LoginResult resultVo) {
             tipDialog.dismiss();
             if("0".equals(resultVo.getCode())){
-                //保存用户名
+                //登录成功,保存用户名,登录名和密码
                 SPUtils.getInstance().put("userName",resultVo.getUserName());
                 SPUtils.getInstance().put("userId",resultVo.getUserId());
                 SPUtils.getInstance().put("eNo",resultVo.geteNo());
                 SPUtils.getInstance().put("loginPassword",resultVo.getPassWord());
-                //保存登录名
                 SPUtils.getInstance().put("loginName",edit_name.getText().toString());
-
+                SPUtils.getInstance().put("loginPsd",edit_psd.getText().toString());
                 startActivity(new Intent(LoginActivity.this,MainActivity2.class));
                 finish();
             }else{

@@ -130,13 +130,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,M
                     printer_state.setText("打印机连接成功");
                     break;
                 case Constants.RESP_MSG_HOST_ERROR:
-                    printer_state.setText("打印机地址错误");
+                    printer_state.setText("没有找到打印机");
                     break;
                 case Constants.RESP_MSG_CONNECT_EXCEPTION:
                     printer_state.setText("打印机连接异常，请检查网络和打印机");
                     break;
                 case Constants.RESP_MSG_SOCKET_TIMEOUT:
                     printer_state.setText("打印机连接超时");
+                    break;
+                case Constants.RESP_MSG_DISCONNECT:
+                    printer_state.setText("打印机连接断开，请检查网络和打印机");
                     break;
                 case Constants.RESP_MSG_RECONNECT:
                     Bundle bundle = msg.getData();
@@ -280,7 +283,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,M
                 //拿出第一条打印
                 currentOrderBean = orderBeanList.get(0);
                 if(currentOrderBean != null && printService != null){
-                    printService.printMenu(currentOrderBean);
+                    printService.printOneColumnMenu(currentOrderBean);
                 }
                 //新数据都放在最前端
                 orderBeans.addAll(0,orderBeanList);
@@ -366,7 +369,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,M
                 if(ob.getIsPrint() == 0){
                     currentOrderBean = ob;
                     if(currentOrderBean != null && printService != null){
-                        printService.printMenu(currentOrderBean);
+                        printService.printOneColumnMenu(currentOrderBean);
                     }
                     return;
                 }
@@ -388,7 +391,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,M
 
     @Override
     public void btnClick(String ip1, String ip2, String ip3, String ip4) {
-        printService.setmConnectCount(1);
+        printService.releaseSocket();
+        printService.setmConnectCount(3);
         printIp = ip1+"."+ip2+"."+ip3+"."+ip4;
         printer_state.setText("正在连接打印机....");
         printService.initSocket(printIp, 9100);
