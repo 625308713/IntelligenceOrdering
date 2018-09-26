@@ -103,8 +103,9 @@ public class ModifyPsdDialog extends DialogFragment {
     private LoginView loginView = new LoginView() {
         @Override
         public void onSuccess(LoginResult resultVo) {
-            //发送消息，关闭activity,跳转到登录页面
-            RxBus.get().send(API.R_1);
+            //发送消息，关闭activity,跳转到登录页面,取消本地保存的密码
+            SPUtils.getInstance().put("loginPsd","");
+//            RxBus.get().send(API.R_1);
             ToastUtils.showLong(resultVo.getMessage());
             tipDialog.dismiss();
         }

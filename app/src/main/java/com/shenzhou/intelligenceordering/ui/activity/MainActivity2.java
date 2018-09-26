@@ -382,8 +382,8 @@ public class MainActivity2 extends BaseActivity implements View.OnClickListener,
     //修改完成密码,退到登录页面
     @Subscribe(code = API.R_1)
     public void closeAndTurn(){
-        startActivity(new Intent(myContext,LoginActivity.class));
         finish();
+        startActivity(new Intent(myContext,LoginActivity.class));
     }
 
     //可打印下一条
