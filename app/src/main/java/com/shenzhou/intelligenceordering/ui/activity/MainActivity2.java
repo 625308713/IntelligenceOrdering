@@ -24,6 +24,7 @@ import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 import com.shenzhou.intelligenceordering.R;
 import com.shenzhou.intelligenceordering.adapter.OrderListAdapter;
 import com.shenzhou.intelligenceordering.app.API;
+import com.shenzhou.intelligenceordering.app.MyApplication;
 import com.shenzhou.intelligenceordering.bean.OrderBean;
 import com.shenzhou.intelligenceordering.bean.OrderCollectionResult;
 import com.shenzhou.intelligenceordering.bean.OrderItem;
@@ -125,6 +126,7 @@ public class MainActivity2 extends BaseActivity implements View.OnClickListener,
                         //修改服务端状态
                         Map map = new HashMap<String, String>();
                         map.put("orderNo", currentOrderBean.getOrderNo());
+                        map.put("goodsType", MyApplication.goodsType+"");
                         commonPresenter.modifyOrderPrintInfo(map);
                         Log.i("dai","打印成功");
                         printer_state.setText("打印已连接");
@@ -218,6 +220,7 @@ public class MainActivity2 extends BaseActivity implements View.OnClickListener,
                         Log.i("dai","请求菜单列表"+ TimeUtils.getNowString());
                         Map map = new HashMap<String, String>();
                         map.put("eNo", SPUtils.getInstance().getString("eNo"));
+                        map.put("goodsType", MyApplication.goodsType+"");
                         orderListPresenter.orderCollectionReq(map);
                     }
                 } catch (Exception e) {

@@ -163,7 +163,6 @@ public class PrintService extends Service {
                         while (count == 0) {
                             count = mInStream.available();
                         }
-                        //没有接到数据 直接执行下个循环，容易导致获取网络数据丢失
 //                        if(mInStream.available()<=0){
 //                            continue;
 //                        }else{

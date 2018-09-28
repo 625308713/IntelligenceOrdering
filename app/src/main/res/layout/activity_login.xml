@@ -67,8 +67,36 @@
                 android:textColorHint="@color/white"
                 android:textSize="@dimen/text_2"/>
         </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="30dp">
+            <TextView
+                android:onClick="onClick"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_3"
+                android:background="@color/red"
+                android:padding="10dp"
+                android:layout_marginRight="15dp"
+                android:text="菜品打印"
+                android:id="@+id/food_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:onClick="onClick"
+                android:textColor="@color/darkgray_1"
+                android:textSize="@dimen/text_3"
+                android:background="@drawable/text_solid"
+                android:padding="10dp"
+                android:text="酒水打印"
+                android:layout_marginLeft="15dp"
+                android:id="@+id/wine_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
         <Button
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="40dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/white"

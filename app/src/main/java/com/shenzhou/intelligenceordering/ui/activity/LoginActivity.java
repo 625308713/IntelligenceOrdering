@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.allenliu.versionchecklib.v2.AllenVersionChecker;
 import com.allenliu.versionchecklib.v2.builder.DownloadBuilder;
@@ -15,6 +16,7 @@ import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.qmuiteam.qmui.widget.dialog.QMUITipDialog;
 import com.shenzhou.intelligenceordering.R;
+import com.shenzhou.intelligenceordering.app.MyApplication;
 import com.shenzhou.intelligenceordering.bean.LoginResult;
 import com.shenzhou.intelligenceordering.bean.VersionBean;
 import com.shenzhou.intelligenceordering.bean.VersionResult;
@@ -39,6 +41,7 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
     private String updateContent;
     private int versionCode;
     private DownloadBuilder builder;
+    private TextView food_btn,wine_btn;
 
     @Override
     protected void setContentView() {
@@ -49,6 +52,8 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
     protected void initView() {
         edit_name = findViewById(R.id.edit_name);
         edit_psd = findViewById(R.id.edit_psd);
+        food_btn = findViewById(R.id.food_btn);
+        wine_btn = findViewById(R.id.wine_btn);
     }
 
     @Override
@@ -80,6 +85,20 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener{
     @Override
     public void onClick(View view) {
         switch (view.getId()){
+            case R.id.food_btn:
+                MyApplication.goodsType = 0;
+                food_btn.setTextColor(getResources().getColor(R.color.white));
+                food_btn.setBackgroundResource(R.color.red);
+                wine_btn.setTextColor(getResources().getColor(R.color.darkgray_1));
+                wine_btn.setBackgroundResource(R.drawable.text_solid);
+                break;
+            case R.id.wine_btn:
+                MyApplication.goodsType = 1;
+                food_btn.setTextColor(getResources().getColor(R.color.darkgray_1));
+                food_btn.setBackgroundResource(R.drawable.text_solid);
+                wine_btn.setTextColor(getResources().getColor(R.color.white));
+                wine_btn.setBackgroundResource(R.color.red);
+                break;
             case R.id.btn_login:
                 if(StringUtils.isEmpty(edit_name.getText()+"")){
                     ToastUtils.showShort("请输入用户名");
