@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -319,6 +320,9 @@ public class MainActivity2 extends BaseActivity implements View.OnClickListener,
                 }
                 //发送消息，打印
                 RxBus.get().send(API.R_2);
+            }else{
+                Log.i("dai","发送空信息，保持socket连接");
+                printService.printNull();
             }
         }
 

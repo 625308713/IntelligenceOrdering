@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.shenzhou.intelligenceordering.bean.OrderBean;
 import com.shenzhou.intelligenceordering.bean.OrderPojo;
@@ -267,16 +268,19 @@ public class PrintService extends Service {
             }
             try {
                 if(mBufferedWriter != null){
+                    Log.i("dai","开始打印:"+data);
                     mBufferedWriter.write(data);
                     mBufferedWriter.flush();
                     if(isPrintFlag){
                         //票面打印完成，切纸
+                        Log.i("dai","开始切纸");
                         mBufferedWriter.write(new String(Constants.COMM_CUT_PAPER));
                         mBufferedWriter.flush();
                     }
                 }
 //                mSocket.shutdownOutput();
             } catch (Exception e) {
+                Log.i("dai","打印有异常");
                 e.printStackTrace();
                 releaseAndReConnect();
             }
@@ -285,6 +289,29 @@ public class PrintService extends Service {
                 Thread.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 有无数据都发送指令线程,防止时间过久不和打印机通信导致断开连接
+     */
+    private class WriteThread2 extends Thread {
+        @Override
+        public void run() {
+            super.run();
+            if (!isConnected()) {
+                releaseAndReConnect();
+            }
+            try {
+                if(mBufferedWriter != null){
+                    byte buffer = 0;
+                    mBufferedWriter.write(buffer);
+                    mBufferedWriter.flush();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                releaseAndReConnect();
             }
         }
     }
@@ -304,7 +331,9 @@ public class PrintService extends Service {
     public void printThreeColumnMenu(OrderPojo bean){
         sendData(PrintFormatUtil.getThreeColTemplate(bean), true);
     }
-
+    public void printNull(){
+        sendData();
+    }
     /**
      * 发送数据、指令
      * @param data
@@ -321,6 +350,10 @@ public class PrintService extends Service {
      */
     public void sendData(String data, boolean isPrint){
         new WriteThread(data, isPrint).start();
+    }
+
+    public void sendData(){
+        new WriteThread2().start();
     }
 
     public void SetState(Boolean state)

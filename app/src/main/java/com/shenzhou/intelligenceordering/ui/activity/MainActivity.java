@@ -391,7 +391,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener,M
 
     @Override
     public void btnClick(String ip1, String ip2, String ip3, String ip4) {
-        printService.releaseSocket();
+//        printService.releaseSocket();
         printService.setmConnectCount(3);
         printIp = ip1+"."+ip2+"."+ip3+"."+ip4;
         printer_state.setText("正在连接打印机....");
