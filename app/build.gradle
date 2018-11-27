@@ -6,8 +6,8 @@ android {
         applicationId "com.shenzhou.intelligenceordering"
         minSdkVersion 19
         targetSdkVersion 27
-        versionCode 1
-        versionName "1.0"
+        versionCode 3
+        versionName "1.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -19,7 +19,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     //工具大全AndroidUtilCode 参考https://github.com/Blankj/AndroidUtilCode/blob/master/utilcode/README-CN.md说明使用
     implementation 'com.blankj:utilcode:1.20.1'
     //retrofit2

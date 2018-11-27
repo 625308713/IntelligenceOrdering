@@ -349,7 +349,7 @@ public class MainActivity2 extends BaseActivity implements View.OnClickListener,
 
         @Override
         public void onError(String result) {
-
+            Log.i("dai",result+"...");
         }
     };
 

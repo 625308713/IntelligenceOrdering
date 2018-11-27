@@ -196,6 +196,7 @@ public class PrintService extends Service {
     public void backPrinterStatus(String status){
         if (status.equalsIgnoreCase(PrintStatus.PS_OK.getValue())) {
             //状态正常
+            Log.i("dai","printFlag:"+isPrintFlag);
             if(isPrintFlag){
                 printStatusListener.onMessageListener(Constants.RESP_MSG_PRINT_SUCCESS, "");
             }else{
@@ -268,19 +269,16 @@ public class PrintService extends Service {
             }
             try {
                 if(mBufferedWriter != null){
-                    Log.i("dai","开始打印:"+data);
                     mBufferedWriter.write(data);
                     mBufferedWriter.flush();
                     if(isPrintFlag){
                         //票面打印完成，切纸
-                        Log.i("dai","开始切纸");
                         mBufferedWriter.write(new String(Constants.COMM_CUT_PAPER));
                         mBufferedWriter.flush();
                     }
                 }
 //                mSocket.shutdownOutput();
             } catch (Exception e) {
-                Log.i("dai","打印有异常");
                 e.printStackTrace();
                 releaseAndReConnect();
             }
